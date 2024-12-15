@@ -90,15 +90,14 @@ const CreateEvent = () => {
           isPrivate: data.isPrivate
         };
 
-        const response = await api.post('events', eventData);
-
-        const result = await response.json();
+        const response = await api.post('event', eventData);
         
-        if (!response.ok) {
-          throw new Error(result.message || 'Failed to create event');
+        if (response.statusText === 'Created') {
+          resolve(response?.data?.message);
+        } else {
+          reject(new Error(response?.data?.message));
         }
 
-        resolve(result);
       } catch (error) {
         reject(error);
       }

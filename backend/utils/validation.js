@@ -73,12 +73,6 @@ const validateUpdateUser = (data) => {
 const validateRegistration = (data) => {
   const errors = {};
 
-  if (!data.username?.trim()) {
-    errors.username = "Username is required";
-  } else if (data.username.length < 3) {
-    errors.username = "Username must be at least 3 characters";
-  }
-
   if (!data.email?.trim()) {
     errors.email = "Email is required";
   } else if (!/^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+$/.test(data.email)) {

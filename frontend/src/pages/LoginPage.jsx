@@ -5,6 +5,8 @@ import * as yup from 'yup';
 import { Link } from 'react-router-dom';
 import { FiMail, FiLock } from 'react-icons/fi';
 import { toast } from 'sonner';
+import api from '../services/api';
+import { useAuth } from '../contexts/AuthContext';
 
 const schema = yup.object().shape({
   email: yup.string().email('Invalid email format').required('Email is required'),
@@ -12,6 +14,7 @@ const schema = yup.object().shape({
 });
 
 const LoginPage = () => {
+  const { login } = useAuth();
   const { register, handleSubmit, formState: { errors } } = useForm({
     resolver: yupResolver(schema)
   });
@@ -19,21 +22,16 @@ const LoginPage = () => {
   const onSubmit = async (data) => {
     const promise = new Promise(async (resolve, reject) => {
       try {
-        const response = await fetch('http://localhost:5000/api/auth/login', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify(data)
-        });
+        const response = await api.post('auth/login', data);
         
-        const result = await response.json();
-        if (response.ok) {
-          localStorage.setItem('token', result.token);
-          resolve(result);
+        
+        if (response.statusText === 'OK') {
+          login(response?.data);
+          resolve(response?.data?.message);
         } else {
-          reject(new Error(result.message));
+          reject(new Error(response?.data?.message));
         }
+        console.log(response);
       } catch (error) {
         reject(error);
       }

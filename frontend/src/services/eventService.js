@@ -34,13 +34,13 @@ export const getMyRSVPEvents = async (userId) => {
 
 export const getEventById = async (eventId) => {
   const events = await getEvents();
-  return events.filter((event) => event._id === eventId);
+  return events.find((event) => event._id === eventId);
 };
 
 export const cancelRSVP = async (eventId) => {
   const promise = new Promise(async (resolve, reject) => {
     try {
-      const response = await api.delete(`/events/${eventId}/rsvp`);
+      const response = await api.delete(`/event/rsvp/${eventId}`);
       resolve(response.data);
     } catch (error) {
       reject(error);
@@ -62,22 +62,22 @@ export const eventsCreatedByUser = async (userId) => {
 };
 
 export const deleteEvent = async (eventId) => {
-  const response = await api.delete(`/events/${eventId}`);
+  const response = await api.delete(`/event/${eventId}`);
   return response.data;
 };
 
 export const createEvent = async (event) => {
-  const response = await api.post("/events", event);
+  const response = await api.post("/event", event);
   return response.data;
 };
 
 export const getEvent = async (id) => {
-  const response = await api.get(`/events/${id}`);
+  const response = await api.get(`/event/${id}`);
   return response.data;
 };
 
 export const updateEvent = async (id, eventData) => {
   console.log(id);
-  const response = await api.put(`/events/${id}`, eventData);
+  const response = await api.put(`/event/${id}`, eventData);
   return response.data;
 };

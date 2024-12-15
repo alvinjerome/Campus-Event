@@ -5,6 +5,7 @@ import * as yup from 'yup';
 import { Link } from 'react-router-dom';
 import { FiUser, FiMail, FiLock, FiHash } from 'react-icons/fi';
 import { toast } from 'sonner';
+import api from '../services/api';
 
 const schema = yup.object().shape({
   fullName: yup.string().required('Full name is required'),
@@ -31,13 +32,7 @@ const RegisterPage = () => {
   const onSubmit = async (data) => {
     const promise = new Promise(async (resolve, reject) => {
       try {
-        const response = await fetch('http://localhost:5000/api/auth/register', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify(data)
-        });
+        const response = await api.post('auth/signup', data);
         
         const result = await response.json();
         if (response.ok) {

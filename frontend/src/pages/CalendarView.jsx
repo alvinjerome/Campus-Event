@@ -64,7 +64,7 @@ const EventCalendar = () => {
         <div className='flex items-center justify-between p-4 border-b'>
           <button
             onClick={previousMonth}
-            className='p-2 hover:bg-gray-100 rounded transition'
+            className='p-2 hover:bg-gray-100 bg-white rounded transition'
           >
             &lt;
           </button>
@@ -73,7 +73,7 @@ const EventCalendar = () => {
           </h2>
           <button
             onClick={nextMonth}
-            className='p-2 hover:bg-gray-100 rounded transition'
+            className='p-2 hover:bg-gray-100 bg-white rounded transition'
           >
             &gt;
           </button>

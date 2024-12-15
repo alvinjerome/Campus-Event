@@ -6,12 +6,14 @@ const {
   loginUser,
   refreshToken,
   logout,
+  becomeAdmin,
 } = require("../controllers/authController");
 
 // Public routes
 router.post("/signup", registerUser);
 router.post("/login", loginUser);
 router.post("/refresh-token", refreshToken);
+router.post("/request-admin", becomeAdmin);
 
 // Protected routes
 router.use(verifyToken);

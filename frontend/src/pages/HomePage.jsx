@@ -1,82 +1,86 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
+import { FiCalendar, FiMapPin, FiUsers, FiClock } from 'react-icons/fi';
+import { format } from 'date-fns';
+import { getEvents } from '../services/eventService';
+import { toast } from 'sonner';
+import EventCard from '../components/events/EventCard';
 
 const HomePage = () => {
-  return (
-    <div className="w-full m-0 p-0">
-      <div className="text-center py-24 px-8 bg-gradient-to-r from-blue-500 to-blue-700 text-white">
-        <h1 className="text-5xl font-bold mb-6 max-w-3xl mx-auto">Campus Events Hub</h1>
-        <p className="text-xl max-w-2xl mx-auto mb-8">Discover, Join, and Experience Amazing Campus Events</p>
-        <div className="flex gap-4 justify-center mt-8">
-          <Link to="/events" className="px-6 py-3 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-transform hover:-translate-y-1 hover:shadow-lg">
-            View Events
-          </Link>
-          <Link to="/register" className="px-6 py-3 bg-white text-blue-500 rounded-lg border-2 border-blue-500 hover:bg-blue-50 transition-transform hover:-translate-y-1 hover:shadow-lg">
-            Sign Up Now
-          </Link>
-        </div>
+  const [events, setEvents] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [filter, setFilter] = useState('all');
+
+  useEffect(() => {
+    const fetchEvents = async () => {
+      try {
+        const data = await getEvents();
+        setEvents(data);
+      } catch (error) {
+        toast.error('Failed to fetch events');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchEvents();
+  }, []);
+
+  const filteredEvents = filter === 'all' 
+    ? events 
+    : events.filter(event => event.category === filter);
+
+  const categories = ['all', ...new Set(events.map(event => event.category))];
+
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
       </div>
-      
-      <div className="max-w-7xl mx-auto py-12 px-8">
-        <h2 className="text-4xl font-bold mb-8 text-center">Featured Events</h2>
-        <div className="flex flex-wrap justify-center gap-8">
-          {/* Event Card 1 */}
-          <div className="flex-none w-[350px] bg-white rounded-xl shadow-md hover:shadow-xl transition-all hover:-translate-y-1 overflow-hidden">
-            <div className="h-48 bg-gradient-to-r from-gray-100 to-gray-200 relative">
-              {/* Replace with your image: <img src="/path-to-image.jpg" alt="Tech Summit" className="w-full h-full object-cover" /> */}
-              <div className="absolute top-4 right-4 bg-white px-3 py-1 rounded-lg font-semibold">MAR 25</div>
-            </div>
-            <div className="p-6">
-              <h3 className="text-xl font-semibold mb-2">Tech Innovation Summit</h3>
-              <p className="flex gap-4 text-gray-600 text-sm mb-4">
-                <span className="flex items-center">📍 Main Auditorium</span>
-                <span className="flex items-center">⏰ 2:00 PM</span>
-              </p>
-              <p className="text-sm text-gray-500 mb-4">42 seats remaining</p>
-              <button className="w-full px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors">
-                RSVP Now
-              </button>
-            </div>
-          </div>
+    );
+  }
 
-          {/* Event Card 2 */}
-          <div className="flex-none w-[350px] bg-white rounded-xl shadow-md hover:shadow-xl transition-all hover:-translate-y-1 overflow-hidden">
-            <div className="h-48 bg-gradient-to-r from-gray-100 to-gray-200 relative">
-              {/* Replace with your image: <img src="/path-to-image.jpg" alt="Sports Event" className="w-full h-full object-cover" /> */}
-              <div className="absolute top-4 right-4 bg-white px-3 py-1 rounded-lg font-semibold">MAR 27</div>
-            </div>
-            <div className="p-6">
-              <h3 className="text-xl font-semibold mb-2">Annual Sports Meet</h3>
-              <p className="flex gap-4 text-gray-600 text-sm mb-4">
-                <span className="flex items-center">📍 University Stadium</span>
-                <span className="flex items-center">⏰ 9:00 AM</span>
-              </p>
-              <p className="text-sm text-gray-500 mb-4">150 seats remaining</p>
-              <button className="w-full px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors">
-                RSVP Now
-              </button>
-            </div>
-          </div>
-
-          {/* Event Card 3 */}
-          <div className="flex-none w-[350px] bg-white rounded-xl shadow-md hover:shadow-xl transition-all hover:-translate-y-1 overflow-hidden">
-            <div className="h-48 bg-gradient-to-r from-gray-100 to-gray-200 relative">
-              {/* Replace with your image: <img src="/path-to-image.jpg" alt="Cultural Night" className="w-full h-full object-cover" /> */}
-              <div className="absolute top-4 right-4 bg-white px-3 py-1 rounded-lg font-semibold">MAR 30</div>
-            </div>
-            <div className="p-6">
-              <h3 className="text-xl font-semibold mb-2">Cultural Night 2024</h3>
-              <p className="flex gap-4 text-gray-600 text-sm mb-4">
-                <span className="flex items-center">📍 Open Air Theatre</span>
-                <span className="flex items-center">⏰ 6:30 PM</span>
-              </p>
-              <p className="text-sm text-gray-500 mb-4">85 seats remaining</p>
-              <button className="w-full px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors">
-                RSVP Now
-              </button>
-            </div>
-          </div>
+  return (
+    <div className="min-h-screen bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
+      <div className="max-w-7xl mx-auto">
+        <div className="text-center mb-12">
+          <h1 className="text-4xl font-bold text-gray-900 mb-4">
+            Campus Events
+          </h1>
+          <p className="text-lg text-gray-600 max-w-2xl mx-auto">
+            Discover and join exciting events happening on campus
+          </p>
         </div>
+
+        {/* Category Filter */}
+        <div className="mb-8 flex flex-wrap gap-2 justify-center">
+          {categories.map((category) => (
+            <button
+              key={category}
+              onClick={() => setFilter(category)}
+              className={`px-4 py-2 rounded-full text-sm font-medium transition-colors
+                ${filter === category
+                  ? 'bg-blue-600 text-white'
+                  : 'bg-white text-gray-600 hover:bg-gray-100'
+                }`}
+            >
+              {category.charAt(0).toUpperCase() + category.slice(1)}
+            </button>
+          ))}
+        </div>
+
+        {/* Events Grid */}
+        {filteredEvents.length === 0 ? (
+          <div className="text-center text-gray-600 py-12">
+            No events found for this category.
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            {filteredEvents.map((event) => (
+              <EventCard key={event._id} event={event} />
+            ))}
+          </div>
+        )}
       </div>
     </div>
   );
