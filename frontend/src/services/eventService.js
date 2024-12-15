@@ -77,7 +77,6 @@ export const getEvent = async (id) => {
 };
 
 export const updateEvent = async (id, eventData) => {
-  console.log(id);
   const response = await api.put(`/event/${id}`, eventData);
   return response.data;
 };

@@ -2,7 +2,7 @@ import React from 'react';
 import { useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import * as yup from 'yup';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { FiMail, FiLock } from 'react-icons/fi';
 import { toast } from 'sonner';
 import api from '../services/api';
@@ -15,6 +15,7 @@ const schema = yup.object().shape({
 
 const LoginPage = () => {
   const { login } = useAuth();
+  const navigate = useNavigate();
   const { register, handleSubmit, formState: { errors } } = useForm({
     resolver: yupResolver(schema)
   });
@@ -31,7 +32,6 @@ const LoginPage = () => {
         } else {
           reject(new Error(response?.data?.message));
         }
-        console.log(response);
       } catch (error) {
         reject(error);
       }
@@ -39,8 +39,8 @@ const LoginPage = () => {
 
     toast.promise(promise, {
       loading: 'Logging in...',
-      success: (data) => {
-        window.location.href = '/events';
+      success: async (data) => {
+        navigate('/events');
         return 'Successfully logged in!';
       },
       error: (err) => `Login failed: ${err.message}`

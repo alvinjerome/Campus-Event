@@ -1,11 +1,12 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import * as yup from 'yup';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { FiUser, FiMail, FiLock, FiHash } from 'react-icons/fi';
 import { toast } from 'sonner';
 import api from '../services/api';
+import { useAuth } from '../contexts/AuthContext';
 
 const schema = yup.object().shape({
   fullName: yup.string().required('Full name is required'),
@@ -25,21 +26,29 @@ const schema = yup.object().shape({
 });
 
 const RegisterPage = () => {
+  const { login, user } = useAuth();
+  const navigate = useNavigate();
   const { register, handleSubmit, formState: { errors } } = useForm({
     resolver: yupResolver(schema)
   });
+
+  useEffect(() => {
+    if (user) {
+      navigate('/events');
+    }
+  }, [user]);
 
   const onSubmit = async (data) => {
     const promise = new Promise(async (resolve, reject) => {
       try {
         const response = await api.post('auth/signup', data);
-        
-        const result = await response.json();
-        if (response.ok) {
-          localStorage.setItem('token', result.token);
-          resolve(result);
+
+        if (response?.statusText?.toLowerCase() === 'created') {
+          
+          resolve(response.data);
+     
         } else {
-          reject(new Error(result.message));
+          reject(new Error(response.data.message));
         }
       } catch (error) {
         reject(error);
@@ -48,11 +57,13 @@ const RegisterPage = () => {
 
     toast.promise(promise, {
       loading: 'Creating your account...',
-      success: (data) => {
-        window.location.href = '/events';
+      success: async () => {
+        navigate('/login');
         return 'Account created successfully!';
       },
-      error: (err) => `Registration failed: ${err.message}`
+      error: (err) => {
+        return `Registration failed: ${err.message}`
+      }
     });
   };
 
