@@ -25,8 +25,8 @@ const LoginPage = () => {
       try {
         const response = await api.post('auth/login', data);
         
-        
-        if (response.statusText === 'OK') {
+
+        if (response.status === 200) {
           login(response?.data);
           resolve(response?.data?.message);
         } else {
@@ -43,7 +43,9 @@ const LoginPage = () => {
         navigate('/events');
         return 'Successfully logged in!';
       },
-      error: (err) => `Login failed: ${err.message}`
+      error: (err) => {
+        return `Login failed: ${err.message}`
+      }
     });
   };
 
